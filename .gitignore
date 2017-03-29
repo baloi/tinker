@@ -1,0 +1,5 @@
+curl_evolution/*
+selfie/*
+.*~
+*.o
+my_curl/*.o
