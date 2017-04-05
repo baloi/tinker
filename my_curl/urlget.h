@@ -7,3 +7,10 @@
 #ifndef FALSE
 #define FALSE 0
 #endif
+
+#define CONF_MUTE  0
+
+#define CONF_DEFAULT 0
+#define CONF_PROXY  (1<<0)
+
+#endif /* URLGET_H */
