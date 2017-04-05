@@ -12,5 +12,6 @@
 
 #define CONF_DEFAULT 0
 #define CONF_PROXY  (1<<0)
+//TODO: code...
 
 #endif /* URLGET_H */
