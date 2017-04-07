@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <unistd.h>
 #include <termios.h>
 
@@ -9,16 +10,16 @@ void disableRawMode() {
 
 void enableRawMode() {
 
-    /* entering raw mode where keypresses will not be echoed on the 
+    /* entering raw mode where keypresses will not be echoed on the
        terminal. To get out of it and see what you are typing again,
-       press 
-       
-       Ctrl-c ENTER 
+       press
+
+       Ctrl-c ENTER
        type "reset" ENTER
     */
     tcgetattr(STDIN_FILENO, &orig_termios);
     atexit(disableRawMode);
-    
+
     struct termios raw = orig_termios;
     /* we use the NOT operator to set the ECHO bitflag and then use the bitwise
        AND flag to set the fourth bit to zero and causes every other bit to
