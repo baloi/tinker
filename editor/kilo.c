@@ -1,8 +1,8 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <termios.h>
+#include <unistd.h>
 
 struct termios orig_termios; /* save terminal's original attributes */
 
@@ -25,13 +25,10 @@ void enableRawMode() {
     struct termios raw = orig_termios;
     /* we use the NOT operator to set the ECHO bitflag and then use the bitwise
        AND flag to set the fourth bit to zero and causes every other bit to
-       retain its value
-    */
-    raw.c_lflag &= ~(ECHO | ICANON); /* ICANON flag allows us to 
+       retain its value */
+    raw.c_lflag &= ~(ECHO | ICANON | ISIG); /* ICANON flag allows us to 
                                     turn off canonical mode and be reading
                                     input byte-by-byte */
-                            
-
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
