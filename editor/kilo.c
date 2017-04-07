@@ -24,7 +24,10 @@ void enableRawMode() {
        AND flag to set the fourth bit to zero and causes every other bit to
        retain its value
     */
-    raw.c_lflag &= ~(ECHO);
+    raw.c_lflag &= ~(ECHO | ICANON); /* ICANON flag allows us to 
+                                    turn off canonical mode and be reading
+                                    input byte-by-byte */
+                            
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
