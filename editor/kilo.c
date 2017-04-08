@@ -26,25 +26,33 @@ void enableRawMode() {
     /* we use the NOT operator to set the ECHO bitflag and then use the bitwise
        AND flag to set the fourth bit to zero and causes every other bit to
        retain its value */
-    raw.c_lflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
-    raw.c_lflag &= ~(OPOST); 
-    raw.c_lflag |= ~(CS8); 
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
+    raw.c_oflag &= ~(OPOST); 
+    raw.c_cflag |= ~(CS8); 
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
                 /* ICANON flag allows us to turn off canonical mode and be 
                 reading input byte-by-byte */
+    /* set timeout */
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 1;
+
+
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
 int main() {
     enableRawMode();
 
-    char c;
-    while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
-        if (isprint(c)) {
-            printf("%d ('%c')\r\n", c, c);
-        } else {
-            printf("%d\r\n", c);
+    while (1) {
+        char c;
+        while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
+            if (isprint(c)) {
+                printf("%d ('%c')\r\n", c, c);
+            } else {
+                printf("%d\r\n", c);
+            }
         }
+        if (c == 'q') break;
     }
     return 0;
 }
