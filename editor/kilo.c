@@ -8,13 +8,21 @@
 #define CTRL_KEY(k) ((k) & 0x1f)
 struct termios orig_termios; /* save terminal's original attributes */
 
+struct editorConfig {
+    struct termios orig_termios;
+};
+
+struct editorConfig E;
+
 void die(const char *s) {
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
     perror(s);
     exit(1);
 }
 
 void disableRawMode() {
-    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
         die("tcsetattr");
 }
 
@@ -27,10 +35,10 @@ void enableRawMode() {
        Ctrl-c ENTER
        type "reset" ENTER
     */
-    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
+    if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1) die("tcgetattr");
     atexit(disableRawMode);
 
-    struct termios raw = orig_termios;
+    struct termios raw = E.orig_termios;
     /* we use the NOT operator to set the ECHO bitflag and then use the bitwise
        AND flag to set the fourth bit to zero and causes every other bit to
        retain its value */
@@ -65,19 +73,36 @@ char editorReadKey() {
     */
 }
 
+void editorDrawRows() {
+    int y;
+    for (y = 0; y < 24; y++) {
+        write(STDOUT_FILENO, "~\r\n", 3);
+    }
+}
+
 void editorRefreshScreen() {
+    // clear screen
     write(STDOUT_FILENO, "\x1b[2J", 4);
+    // reposition cursor at top of screen
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
+    editorDrawRows();
+
+    write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 void editorProcessKeypress() {
     char c = editorReadKey();
     switch (c) {
         case CTRL_KEY('q'):
+            write(STDOUT_FILENO, "\x1b[2J", 4);
+            write(STDOUT_FILENO, "\x1b[H", 3);
             exit(0);
             break;
     }
 
 }
+
 
 int main() {
     enableRawMode(); 
